@@ -1,7 +1,12 @@
 # passive-aggressive-algo
 
 Description about the Dataset 
-7. Attribute Information: (class attribute has been moved to last column)
+   This breast cancer databases was obtained from the University of Wisconsin
+   Hospitals, Madison from Dr. William H. Wolberg.  If you publish results
+   when using this database, then please include this information in your
+   acknowledgements
+   
+. Attribute Information: (class attribute has been moved to last column)
 
    #  Attribute                     Domain
    -- -----------------------------------------
