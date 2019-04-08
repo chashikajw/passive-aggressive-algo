@@ -4,40 +4,38 @@ C = 1;
 Iterations = [1,2,10];
 AlgoNo = "PA";
 
-function weights_bias = PassiveAggresiveTraining (trainingData, C,AlgoNo, MaxIter)
+function weights = PassiveAggresiveTraining (trainingData, C,AlgoNo, MaxIter)
   X_T = trainingData(:,2:10);
-  Y = trainingData(:,11); %classes
   N = size(X_T,1);
+  X_T = [X_T,ones(N,1)]; %add bias column
+  Y = trainingData(:,11); %classes
   d = size(X_T,2); 
   weights = zeros(d,1);
-  bias = 1;
-  weights_bias = [weights;bias];
   X = X_T'; 
   
   % train process
   for i=1:MaxIter
     for n = 1:N
       x = X(:,n);
-      bias_x = 1;
-      x_bias = [x;bias_x];
-      y_predict = weights_bias'*x_bias;
+      
+      y_predict = weights'*x;
       y = getCLass(Y(n,1));
       
-      l = max(0,1- y*(weights_bias'*x_bias)); %only sign is wrong it return a nonzero value. otherwise its 0 
+      l = max(0,1- y*(weights'*x)); %only sign is wrong it return a nonzero value. otherwise its 0 
       tau = 0;
         switch (AlgoNo)
           case "PA"
-            tau = l/ (norm(x_bias,2)^2);           
+            tau = l/ (norm(x,2)^2);           
           case "PA-I"
-            tm = l/ (norm(x_bias,2)^2);
+            tm = l/ (norm(x,2)^2);
             tau =  min (C, tm);          
           case "PA-II"
-            tau = l/ ((norm(x_bias,2)^2) + (1/2*C));        
+            tau = l/ ((norm(x,2)^2) + (1/2*C));        
           otherwise
-            tau = l/ ((norm(x_bias,2)^2) + (1/2*C));
+            tau = l/ ((norm(x,2)^2) + (1/2*C));
         endswitch
                
-      weights_bias = weights_bias + tau*y*x_bias;  %weight update
+      weights = weights + tau*y*x;  %weight update
         
     endfor
   endfor
@@ -61,8 +59,10 @@ endfunction
 
 
 %accuracy test function
-function TestAccuracy(testdata,w)
+function predictions = TestAccuracy(testdata,w)
   Test_T = testdata(:,2:10);
+  N = size(Test_T,1);
+  Test_T = [Test_T,ones(N,1)]; %add bias column
   Yclass =testdata(:,11);
   N =size(Test_T,1);
   Test = Test_T';
@@ -71,8 +71,7 @@ function TestAccuracy(testdata,w)
   
   for n = 1:N
     xt = Test(:,n);
-    xt_bias = [xt;1];
-    y_predict = w'*xt_bias;
+    y_predict = w'*xt;
     y = getCLass(Yclass(n,1));
     
     if(y_predict*y<=0)
